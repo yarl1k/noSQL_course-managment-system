@@ -1,0 +1,34 @@
+{
+  "name": "course-managment-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "tsx src/index.ts",
+    "start": "tsx src/index.ts",
+    "db:init": "node scripts/init-db.js",
+    "typecheck": "tsc --noEmit",
+    "nosql:sync": "tsx src/nosql/cli.ts sync",
+    "nosql:demo": "tsx src/nosql/cli.ts demo",
+    "nosql:benchmark": "tsx src/nosql/cli.ts benchmark"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.33.0",
+  "dependencies": {
+    "dotenv": "^18.0.8",
+    "kysely": "^0.29.6",
+    "pg": "^8.23.1",
+    "mongodb": "^7.8.0",
+    "redis": "^6.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/pg": "^8.23.1",
+    "kysely-codegen": "^0.20.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

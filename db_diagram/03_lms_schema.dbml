@@ -1,0 +1,191 @@
+Table users {
+  id int [pk, increment]
+  name varchar(100) [not null]
+  email varchar(150) [not null, unique]
+  password_hash varchar(255) [not null]
+  is_deleted boolean [not null, default: false]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table roles {
+  id int [pk, increment]
+  name varchar(50) [not null, unique]
+  description text
+}
+Table user_roles {
+  user_id int [not null]
+  role_id int [not null]
+  indexes { (user_id, role_id) [pk] }
+}
+Table categories {
+  id int [pk, increment]
+  name varchar(100) [not null]
+  slug varchar(100) [not null, unique]
+  is_deleted boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table courses {
+  id int [pk, increment]
+  title varchar(150) [not null]
+  description text
+  category_id int [not null]
+  instructor_id int [not null]
+  price numeric(10,2) [not null]
+  is_deleted boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table modules {
+  id int [pk, increment]
+  course_id int [not null]
+  title varchar(150) [not null]
+  sort_order int [not null]
+  is_deleted boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table lessons {
+  id int [pk, increment]
+  module_id int [not null]
+  title varchar(150) [not null]
+  content_url text
+  duration_mins int [not null]
+  sort_order int [not null]
+  is_deleted boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table enrollments {
+  id int [pk, increment]
+  student_id int [not null]
+  course_id int [not null]
+  status varchar(20) [not null]
+  enrolled_at timestamptz [not null]
+  is_deleted boolean [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table lesson_progress {
+  id int [pk, increment]
+  enrollment_id int [not null]
+  lesson_id int [not null]
+  is_completed boolean [not null]
+  completed_at timestamptz
+  updated_at timestamptz [not null]
+  updated_by_id int
+  indexes { (enrollment_id, lesson_id) [unique] }
+}
+Table assignments {
+  id int [pk, increment]
+  lesson_id int [not null]
+  title varchar(150) [not null]
+  max_score int [not null]
+  due_date timestamptz
+  is_deleted boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table submissions {
+  id int [pk, increment]
+  assignment_id int [not null]
+  student_id int [not null]
+  file_url text
+  score int
+  status varchar(20) [not null]
+  submitted_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table reviews {
+  id int [pk, increment]
+  course_id int [not null]
+  student_id int [not null]
+  rating int [not null]
+  comment text
+  is_deleted boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table certificates {
+  id int [pk, increment]
+  enrollment_id int [not null, unique]
+  certificate_code varchar(100) [not null, unique]
+  issued_at timestamptz [not null]
+}
+Table tags {
+  id int [pk, increment]
+  name varchar(50) [not null, unique]
+  is_deleted boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table course_tags {
+  course_id int [not null]
+  tag_id int [not null]
+  indexes { (course_id, tag_id) [pk] }
+}
+Table course_announcements {
+  id int [pk, increment]
+  course_id int [not null]
+  author_id int [not null]
+  title varchar(150) [not null]
+  body text [not null]
+  published_at timestamptz
+  is_deleted boolean [not null]
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+  updated_by_id int
+}
+Table audit_log {
+  id bigint [pk, increment]
+  table_name varchar(100) [not null]
+  record_id bigint [not null]
+  action varchar(20) [not null]
+  changed_at timestamptz [not null]
+  changed_by_id int
+  old_data jsonb
+  new_data jsonb
+}
+
+Ref: users.updated_by_id > users.id
+Ref: user_roles.user_id > users.id
+Ref: user_roles.role_id > roles.id
+Ref: categories.updated_by_id > users.id
+Ref: courses.category_id > categories.id
+Ref: courses.instructor_id > users.id
+Ref: courses.updated_by_id > users.id
+Ref: modules.course_id > courses.id
+Ref: modules.updated_by_id > users.id
+Ref: lessons.module_id > modules.id
+Ref: lessons.updated_by_id > users.id
+Ref: enrollments.student_id > users.id
+Ref: enrollments.course_id > courses.id
+Ref: enrollments.updated_by_id > users.id
+Ref: lesson_progress.enrollment_id > enrollments.id
+Ref: lesson_progress.lesson_id > lessons.id
+Ref: lesson_progress.updated_by_id > users.id
+Ref: assignments.lesson_id > lessons.id
+Ref: assignments.updated_by_id > users.id
+Ref: submissions.assignment_id > assignments.id
+Ref: submissions.student_id > users.id
+Ref: submissions.updated_by_id > users.id
+Ref: reviews.course_id > courses.id
+Ref: reviews.student_id > users.id
+Ref: reviews.updated_by_id > users.id
+Ref: certificates.enrollment_id > enrollments.id
+Ref: tags.updated_by_id > users.id
+Ref: course_tags.course_id > courses.id
+Ref: course_tags.tag_id > tags.id
+Ref: course_announcements.course_id > courses.id
+Ref: course_announcements.author_id > users.id
+Ref: course_announcements.updated_by_id > users.id
+Ref: audit_log.changed_by_id > users.id
